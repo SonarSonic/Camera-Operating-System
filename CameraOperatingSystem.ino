@@ -6,10 +6,12 @@ Servo servoY; //instance of Servo Y
 //servo X
 int pinX = 0; // the pin Servo X is connected to
 int valX; // the current position of potentiometer X
+int moveX; //current movement of the Joystick on the X potentiometer, when this equals 1 or -1 it will be reset to 0 and the x servo will be moved accordingly
 
 //servo Y
 int pinY = 1; // the pin Servo Y is connected t
 int valY; // the current position of potentiometer Y
+int moveY;  //current movement of the Joystick on the Y potentiometer, when this equals 1 or -1 it will be reset to 0 and the x servo will be moved accordingly
 
 //servo X start and finish of currentMove
 int currentX=0;
@@ -31,7 +33,7 @@ unsigned long currentDelayY = 0; //milliseconds since Servo Y was last moved
 unsigned long time = 0; //how long the servo has been runned on for in milliseconds
 
 int currentMove; //the movement in the array list which is currently being performed
-int timePerMovement=1000; //the time taken to perfom each movement, used for calculating the delay given to each servo.
+int timePerMovement=5000; //the time taken to perfom each movement, used for calculating the delay given to each servo.
 
 //current activity
 int currentState = 0; // the current state of the Arduino e.g. Active, Inactive, Idle etc.
@@ -86,13 +88,40 @@ void loop(){
   }
   //move Servo X according to potentiometer
   valX = analogRead(pinX);
-  valX = map(valX, 0, 1023, 0, 180);
-  servoX.write(valX);
-  
+  valX = map(valX, 0, 1023, -90, 90);
+  moveX += valX;
+  if(moveX>=90){
+    valX = servoX.read();
+    if(valX+1<=180){
+  		servoX.write(valX+1);
+    }    
+    moveX=0;
+  }
+  else if(moveX<=-90){
+    valX = servoX.read();
+    if(valX-1>=0){
+  		servoX.write(valX-1);
+    }
+    moveX=0;
+  }
   //move Servo Y according to potentiometer
   valY = analogRead(pinY);
-  valY = map(valY, 0, 1023, 0, 180);
-  servoY.write(valY);
+  valY = map(valY, 0, 1023, -90, 90);
+  moveY += valY;
+  if(moveY>=90){
+    valY = servoY.read();
+    if(valY+1<=180){
+  		servoY.write(valY+1);
+    }    
+    moveY=0;
+  }
+  else if(moveY<=-90){
+    valY = servoY.read();
+    if(valY-1>=0){
+  		servoY.write(valY-1);
+    }
+    moveY=0;
+  }
   delay(15);
   
   addVal = digitalRead(add);
@@ -218,8 +247,8 @@ void addPoint(){ // when the add point button has been pressed
   
   if(pointCount<maxArraySize) // checks their is space for the point
   {      
-  	positionsX[pointCount]=valX; // sets the x position in the array to the current resistor position 
-  	positionsY[pointCount]=valY; // sets the y position in the array to the current resistor position 
+  	positionsX[pointCount]=servoX.read(); // sets the x position in the array to the current resistor position 
+  	positionsY[pointCount]=servoY.read(); // sets the y position in the array to the current resistor position 
     
   	pointCount+=1; // increases the current point count
     
