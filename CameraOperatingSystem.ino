@@ -57,13 +57,11 @@ int pause = 6;
 int pauseVal;
 bool paused = false;
 
-
-void setup() { //this method is called when the Ardunio is started and gives you the chance change settings and connect servos as needed
+void setup(){ //this method is called when the Ardunio is started and gives you the chance change settings and connect servos as needed
   //SERVOS
   servoX.attach(9); //connects the Servo X to pin number 9
   servoY.attach(10); //connects the Servo Y to pin number 10
-  
-  //LEDS
+   //LEDS
   pinMode(13, OUTPUT); //lets pin 13 output a signal to the red LED
   pinMode(12, OUTPUT); //lets pin 12 output a signal to the green LED
   pinMode(11, OUTPUT); //lets pin 11 output a signal to the blue LED
@@ -79,9 +77,7 @@ void loop(){
       setError();
       delay(1000);
       setNotActive();
-    }
-    else //otherwise activate the movement
-    {
+    }else{ //otherwise activate the movement
       setActive();
       runCycle();
     }
@@ -93,14 +89,13 @@ void loop(){
   if(moveX>=90){
     valX = servoX.read();
     if(valX+1<=180){
-  		servoX.write(valX+1);
+  	servoX.write(valX+1);
     }    
     moveX=0;
-  }
-  else if(moveX<=-90){
+  }else if(moveX<=-90){
     valX = servoX.read();
     if(valX-1>=0){
-  		servoX.write(valX-1);
+  	servoX.write(valX-1);
     }
     moveX=0;
   }
@@ -111,14 +106,13 @@ void loop(){
   if(moveY>=90){
     valY = servoY.read();
     if(valY+1<=180){
-  		servoY.write(valY+1);
+  	servoY.write(valY+1);
     }    
     moveY=0;
-  }
-  else if(moveY<=-90){
+  }else if(moveY<=-90){
     valY = servoY.read();
     if(valY-1>=0){
-  		servoY.write(valY-1);
+  	servoY.write(valY-1);
     }
     moveY=0;
   }
@@ -134,130 +128,108 @@ void loop(){
     removePoint();
   }
   
-   clearVal = digitalRead(clear);
+  clearVal = digitalRead(clear);
   if(clearVal == HIGH){ //if the clear button is being pressed, remove all points
     clearPoints();
   }
 }
 
-void runCycle()
-{  
-  for(currentMove=0;currentMove<pointCount;currentMove+=1)
-  {
-    
-  	if(currentMove==0)//if the current movement is 0 set it to the start      
-    {
-   	 	servoX.write(positionsX[0]);
-    	servoY.write(positionsY[0]);  
-    	delay(1000);  
+void runCycle(){
+	
+  for(currentMove=0;currentMove<pointCount;currentMove+=1){
+  	
+    if(currentMove==0){//if the current movement is 0 set it to the start      
+			servoX.write(positionsX[0]);
+			servoY.write(positionsY[0]);
+			delay(1000);  
   	}
   	
- 	 if(currentMove+1<pointCount) // if the current movement isn't the final movement the cycle will continue.
- 	 {        
-		currentX=positionsX[currentMove]; // sets the current position of x
-		targetX=positionsX[currentMove+1]; // sets the target position of x
+  	if(currentMove+1<pointCount){ // if the current movement isn't the final movement the cycle will continue.
+			currentX=positionsX[currentMove]; // sets the current position of x
+			targetX=positionsX[currentMove+1]; // sets the target position of x
+			currentY=positionsY[currentMove]; // sets the current position of y
+			targetY=positionsY[currentMove+1]; // set the target position of y
+			
+			if(difference(currentX, targetX)!=0){ // checks the difference between target x and current x
+				delayX=timePerMovement / difference(currentX, targetX); //if there is a difference it sets the delay for the movement to move at the same time to y
+			}else{
+				delayX=timePerMovement; //if there is no difference the wait time is equal to the time to carry out each movement.
+			}
        
-		currentY=positionsY[currentMove]; // sets the current position of y
-		targetY=positionsY[currentMove+1]; // set the target position of y
-    
-       if(difference(currentX, targetX)!=0){ // checks the difference between target x and current x
-        delayX=timePerMovement / difference(currentX, targetX); //if there is a difference it sets the delay for the movement to move at the same time to y
-       }else{
-       	delayX=timePerMovement; //if there is no difference the wait time is equal to the time to carry out each movement.
-       }
-       
-       if(difference(currentY, targetY)!=0){ // checks the difference between target y and current y
-		delayY=timePerMovement / difference(currentY, targetY); //if there is a difference it sets the delay for the movement to move at the same time to x
-       }else{
+			if(difference(currentY, targetY)!=0){ // checks the difference between target y and current y
+		 		delayY=timePerMovement / difference(currentY, targetY); //if there is a difference it sets the delay for the movement to move at the same time to x
+      }else{
         delayY=timePerMovement; //if there is no difference the wait time is equal to the time to carry out each movement.
-       }
+      }
        
-       
-       while(currentX!=targetX || currentY!=targetY) // the code within the statement will keep running until the current X and Y points equal their targets.
-       {
-         pauseVal = digitalRead(pause);
- 		 if(pauseVal == HIGH){  //if the remove button is being pressed, remove the last point         
-           	paused=!paused;
- 		 	setIdle();
-  			delay(1000);
-           	if(!paused)
-     			setActive();
-           	else             
- 		 		setIdle();
-         }
-         if(!paused){
-         
-       		time = millis(); // records the current time
-			move1 = false; // true or false statement if the x servo should move on this loop, currently false until told otherwise
-			move2 = false; // true or false statement if the y servo should move on this loop, currently false until told otherwise
+      while(currentX!=targetX || currentY!=targetY){ // the code within the statement will keep running until the current X and Y points equal their targets.
+				pauseVal = digitalRead(pause);
+				
+	 			if(pauseVal == HIGH){  //if the remove button is being pressed, remove the last point   
+					paused=!paused;
+					setIdle();
+					delay(1000);
+					
+					if(!paused)
+						setActive();
+					else             
+						setIdle();
+			  }
+			  
+				if(!paused){
+					time = millis(); // records the current time
+					move1 = false; // true or false statement if the x servo should move on this loop, currently false until told otherwise
+					move2 = false; // true or false statement if the y servo should move on this loop, currently false until told otherwise
         
- 	 		if (currentX!=targetX && time - currentDelayX >= delayX) //if the x servo hasn't yet reached the right position and the program has waited long enough to make sure the servos remain in sync.
-        	{
-      			currentDelayX = time; //resets the time for the next loop
-       			if(positionsX[currentMove] <positionsX[currentMove+1]) // if the original x is less than the target x
-            	{
-          			currentX+=1; // the current x increases
-              		move1 = true; // a movement is therefore required
-       			}
-          		else if(positionsX[currentMove] >positionsX[currentMove+1]) // if the original x is greater than the target x
-                {	
-                  	currentX-=1; // the current x decreases
-					move1 = true; // a movement is signalled
-              	}        
-       		}
+ 	 				if (currentX!=targetX && time - currentDelayX >= delayX){ //if the x servo hasn't yet reached the right position and the program has waited long enough to make sure the servos remain in sync.
+ 	 					currentDelayX = time; //resets the time for the next loop
+ 	 					
+						if(positionsX[currentMove] <positionsX[currentMove+1]){ // if the original x is less than the target x
+							currentX+=1; // the current x increases
+              move1 = true; // a movement is therefore required
+       			}else if(positionsX[currentMove] >positionsX[currentMove+1]){ // if the original x is greater than the target x
+              currentX-=1; // the current x decreases
+							move1 = true; // a movement is signalled
+            }   
+ 	 				}
      	
     
-    		if (currentY!=targetY && time - currentDelayY >= delayY)  //if the y servo hasn't yet reached the right position and the program has waited long enough to make sure the servos remain in sync. 
-        	{
-       			currentDelayY = time;  //resets the time for the next loop
-      			if(positionsY[currentMove] <positionsY[currentMove+1])// if the original x is less than the target x
-            	{
-          			currentY+=1; // the current x increases                 
+    			if (currentY!=targetY && time - currentDelayY >= delayY){  //if the y servo hasn't yet reached the right position and the program has waited long enough to make sure the servos remain in sync. 
+						currentDelayY = time;  //resets the time for the next loop
+      			if(positionsY[currentMove] <positionsY[currentMove+1]){// if the original x is less than the target x
+            	currentY+=1; // the current x increases                 
      	  			move2 = true; // a movement is therefore required
-           	 	}
-          		else if(positionsY[currentMove] > positionsY[currentMove+1]) // if the original x is greater than the target x
-                {
-                  	currentY-=1; // the current x decreases
-					move2 = true; // a movement is signalled
-              	}          
+           	}else if(positionsY[currentMove] > positionsY[currentMove+1]){ // if the original x is greater than the target x
+            	currentY-=1; // the current x decreases
+							move2 = true; // a movement is signalled
+						}          
       		}
-    	
-         
-   			if(move1)
-        	{      
-				servoX.write(currentX); //writes the movement to servo x
+    			if(move1){      
+						servoX.write(currentX); //writes the movement to servo x
         	}
-   			if(move2)
-       		{      
-				servoY.write(currentY); // write the movement to servo y
-    		}  
+   				if(move2){      
+						servoY.write(currentY); // write the movement to servo y
+    			}  
         	delay(10);
-         }
-       }
-     }
-	   
+        }
+      }
+    }
   }
   setIdle();
   delay(1000);
   setNotActive();  
-  
 }
 
 void addPoint(){ // when the add point button has been pressed
   
-  if(pointCount<maxArraySize) // checks their is space for the point
-  {      
+  if(pointCount<maxArraySize){ // checks their is space for the point
   	positionsX[pointCount]=servoX.read(); // sets the x position in the array to the current resistor position 
   	positionsY[pointCount]=servoY.read(); // sets the y position in the array to the current resistor position 
-    
   	pointCount+=1; // increases the current point count
-    
   	setIdle(); // the Blue Led is activated to show the point has been logged
   	delay(1000);
   	setNotActive();
-  }
-  else // if no space is available an error is signalled
-  {    
+  }else{ // if no space is available an error is signalled
     setError();
     delay(1000);
     setNotActive();
@@ -266,17 +238,14 @@ void addPoint(){ // when the add point button has been pressed
 
 void removePoint(){ //  when the remove point button has been pressed
   
-  if(pointCount!=0) // checks that their are points to delete
-  {     
-  	positionsX[pointCount-1]=0; // last x position is removed
+  if(pointCount!=0){ // checks that their are points to delete
+    positionsX[pointCount-1]=0; // last x position is removed
   	positionsY[pointCount-1]=0; // last y position is removed
   	pointCount-=1; // the point count is decreased
   	setIdle(); // the Blue Led is activated to show the removal has been logged
   	delay(1000);
   	setNotActive();
-  }
-  else //if all points have already been deleted an error is signalled
-  {    
+  }else{ //if all points have already been deleted an error is signalled
     setError();
     delay(1000);
     setNotActive();
@@ -284,8 +253,9 @@ void removePoint(){ //  when the remove point button has been pressed
 }
 
 void clearPoints(){  // clears the entire list of points
-  if(pointCount!=0)
-  { 
+ 
+  if(pointCount!=0){
+  	
     for(int clearLoop=0;clearLoop<maxArraySize;clearLoop++){
       positionsX[clearLoop]=0;
       positionsY[clearLoop]=0;
@@ -294,9 +264,7 @@ void clearPoints(){  // clears the entire list of points
   	setIdle(); // the blue LED is activated to show the clearance has been completed.
   	delay(1000);
   	setNotActive();
-  }  
-  else //if all points have already been deleted an error is signalled
-  {    
+  }else{ //if all points have already been deleted an error is signalled
     setError();
     delay(1000);
     setNotActive();
