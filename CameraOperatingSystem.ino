@@ -136,84 +136,83 @@ void loop(){
 
 void runCycle(){
 	
-  for(currentMove=0;currentMove<pointCount;currentMove+=1){
+ for(currentMove=0;currentMove<pointCount;currentMove+=1){
   	
     if(currentMove==0){//if the current movement is 0 set it to the start      
-			servoX.write(positionsX[0]);
-			servoY.write(positionsY[0]);
-			delay(1000);  
-  	}
-  	
-  	if(currentMove+1<pointCount){ // if the current movement isn't the final movement the cycle will continue.
-			currentX=positionsX[currentMove]; // sets the current position of x
-			targetX=positionsX[currentMove+1]; // sets the target position of x
-			currentY=positionsY[currentMove]; // sets the current position of y
-			targetY=positionsY[currentMove+1]; // set the target position of y
+	servoX.write(positionsX[0]);
+	servoY.write(positionsY[0]);
+	delay(1000); 
+    }
+	if(currentMove+1<pointCount){ // if the current movement isn't the final movement the cycle will continue.
+		currentX=positionsX[currentMove]; // sets the current position of x
+		targetX=positionsX[currentMove+1]; // sets the target position of x
+		currentY=positionsY[currentMove]; // sets the current position of y
+		targetY=positionsY[currentMove+1]; // set the target position of y
 			
-			if(difference(currentX, targetX)!=0){ // checks the difference between target x and current x
-				delayX=timePerMovement / difference(currentX, targetX); //if there is a difference it sets the delay for the movement to move at the same time to y
-			}else{
-				delayX=timePerMovement; //if there is no difference the wait time is equal to the time to carry out each movement.
-			}
+		if(difference(currentX, targetX)!=0){ // checks the difference between target x and current x
+			delayX=timePerMovement / difference(currentX, targetX); //if there is a difference it sets the delay for the movement to move at the same time to y
+		}else{
+			delayX=timePerMovement; //if there is no difference the wait time is equal to the time to carry out each movement.
+		}
        
-			if(difference(currentY, targetY)!=0){ // checks the difference between target y and current y
-		 		delayY=timePerMovement / difference(currentY, targetY); //if there is a difference it sets the delay for the movement to move at the same time to x
-      }else{
-        delayY=timePerMovement; //if there is no difference the wait time is equal to the time to carry out each movement.
-      }
+		if(difference(currentY, targetY)!=0){ // checks the difference between target y and current y
+		 	delayY=timePerMovement / difference(currentY, targetY); //if there is a difference it sets the delay for the movement to move at the same time to x
+      		}else{
+			delayY=timePerMovement; //if there is no difference the wait time is equal to the time to carry out each movement.
+		}
        
-      while(currentX!=targetX || currentY!=targetY){ // the code within the statement will keep running until the current X and Y points equal their targets.
-				pauseVal = digitalRead(pause);
+      		while(currentX!=targetX || currentY!=targetY){ // the code within the statement will keep running until the current X and Y points equal their targets.
+			pauseVal = digitalRead(pause);
 				
-	 			if(pauseVal == HIGH){  //if the remove button is being pressed, remove the last point   
-					paused=!paused;
-					setIdle();
-					delay(1000);
+	 		if(pauseVal == HIGH){  //if the remove button is being pressed, remove the last point   
+				paused=!paused;
+				setIdle();
+				delay(1000);
 					
-					if(!paused)
-						setActive();
-					else             
-						setIdle();
-			  }
+				if(!paused)
+					setActive();
+				else             
+					setIdle();
+			 }
 			  
-				if(!paused){
-					time = millis(); // records the current time
-					move1 = false; // true or false statement if the x servo should move on this loop, currently false until told otherwise
-					move2 = false; // true or false statement if the y servo should move on this loop, currently false until told otherwise
+			if(!paused){
+				time = millis(); // records the current time
+				move1 = false; // true or false statement if the x servo should move on this loop, currently false until told otherwise
+				move2 = false; // true or false statement if the y servo should move on this loop, currently false until told otherwise
         
- 	 				if (currentX!=targetX && time - currentDelayX >= delayX){ //if the x servo hasn't yet reached the right position and the program has waited long enough to make sure the servos remain in sync.
- 	 					currentDelayX = time; //resets the time for the next loop
+ 	 			if (currentX!=targetX && time - currentDelayX >= delayX){ //if the x servo hasn't yet reached the right position and the program has waited long enough to make sure the servos remain in sync.
+ 	 				currentDelayX = time; //resets the time for the next loop
  	 					
-						if(positionsX[currentMove] <positionsX[currentMove+1]){ // if the original x is less than the target x
-							currentX+=1; // the current x increases
-              move1 = true; // a movement is therefore required
-       			}else if(positionsX[currentMove] >positionsX[currentMove+1]){ // if the original x is greater than the target x
-              currentX-=1; // the current x decreases
-							move1 = true; // a movement is signalled
-            }   
- 	 				}
+					if(positionsX[currentMove] <positionsX[currentMove+1]){ // if the original x is less than the target x
+						currentX+=1; // the current x increases
+        					move1 = true; // a movement is therefore required
+       					}else if(positionsX[currentMove] >positionsX[currentMove+1]){ // if the original x is greater than the target x
+        					currentX-=1; // the current x decreases
+						move1 = true; // a movement is signalled
+        				}   
+ 	 			}
      	
     
-    			if (currentY!=targetY && time - currentDelayY >= delayY){  //if the y servo hasn't yet reached the right position and the program has waited long enough to make sure the servos remain in sync. 
-						currentDelayY = time;  //resets the time for the next loop
-      			if(positionsY[currentMove] <positionsY[currentMove+1]){// if the original x is less than the target x
-            	currentY+=1; // the current x increases                 
-     	  			move2 = true; // a movement is therefore required
-           	}else if(positionsY[currentMove] > positionsY[currentMove+1]){ // if the original x is greater than the target x
-            	currentY-=1; // the current x decreases
-							move2 = true; // a movement is signalled
-						}          
-      		}
-    			if(move1){      
-						servoX.write(currentX); //writes the movement to servo x
-        	}
+    				if (currentY!=targetY && time - currentDelayY >= delayY){  //if the y servo hasn't yet reached the right position and the program has waited long enough to make sure the servos remain in sync. 
+					currentDelayY = time;  //resets the time for the next loop
+      					if(positionsY[currentMove] <positionsY[currentMove+1]){// if the original x is less than the target x
+            					currentY+=1; // the current x increases                 
+     	  					move2 = true; // a movement is therefore required
+           				}else if(positionsY[currentMove] > positionsY[currentMove+1]){ // if the original x is greater than the target x
+            					currentY-=1; // the current x decreases
+						move2 = true; // a movement is signalled
+					}          
+      				}
+    				if(move1){      
+					servoX.write(currentX); //writes the movement to servo x
+        			}
    				if(move2){      
-						servoY.write(currentY); // write the movement to servo y
-    			}  
-        	delay(10);
-        }
-      }
-    }
+					servoY.write(currentY); // write the movement to servo y
+    				}  
+        			delay(10);
+			 }
+      		}			
+    	}
   }
   setIdle();
   delay(1000);
