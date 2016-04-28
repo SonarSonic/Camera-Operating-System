@@ -59,12 +59,12 @@ bool paused = false;
 
 void setup(){ //this method is called when the Ardunio is started and gives you the chance change settings and connect servos as needed
   //SERVOS
-  servoX.attach(9); //connects the Servo X to pin number 9
-  servoY.attach(10); //connects the Servo Y to pin number 10
+  servoX.attach(8); //connects the Servo X to pin number 9
+  servoY.attach(9); //connects the Servo Y to pin number 10
    //LEDS
-  pinMode(13, OUTPUT); //lets pin 13 output a signal to the red LED
-  pinMode(12, OUTPUT); //lets pin 12 output a signal to the green LED
-  pinMode(11, OUTPUT); //lets pin 11 output a signal to the blue LED
+  pinMode(12, OUTPUT); //lets pin 13 output a signal to the red LED
+  pinMode(11, OUTPUT); //lets pin 12 output a signal to the green LED
+  pinMode(10, OUTPUT); //lets pin 11 output a signal to the blue LED
 }
 
 void loop(){    
@@ -121,7 +121,7 @@ void loop(){
       moveY=0;
   }
   }
-  delay(15);
+  delay(20);
   
   addVal = digitalRead(add);
   if(addVal == HIGH){ //if the add button is being pressed, add a new point
@@ -216,7 +216,7 @@ void runCycle(){
             servoY.write(currentY); // write the movement to servo y
           }  
           
-          delay(10);
+          delay(20);
         }
       }     
     }
