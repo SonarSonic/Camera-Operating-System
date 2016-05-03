@@ -71,7 +71,7 @@ void loop(){
   if(currentState==2){ //checks if an error has been found
     return; //if an error was found the loop method is terminatated
   }
-  startVal = digitalRead(start); //start button
+  startVal = digitalRead(2); //start button
   if(currentState!=1 && startVal == HIGH){ //if someone pressed the start button
     if(pointCount==0){//if no points have been added signal an error
       setError();
@@ -123,20 +123,21 @@ void loop(){
   }
   delay(20);
   
-  addVal = digitalRead(add);
+  addVal = digitalRead(3);
   if(addVal == HIGH){ //if the add button is being pressed, add a new point
     addPoint();
   }
   
-  removeVal = digitalRead(remove);
+  removeVal = digitalRead(4);
   if(removeVal == HIGH){  //if the remove button is being pressed, remove the last point
     removePoint();
   }
-  
+  /*
   clearVal = digitalRead(clear);
   if(clearVal == HIGH){ //if the clear button is being pressed, remove all points
     clearPoints();
   }
+  */
 }
 
 void runCycle(){
@@ -314,30 +315,30 @@ void setIdle(){
 void setLED(){
   //NOT ACTIVE
   if(currentState==0){    
-    digitalWrite(13,LOW);
     digitalWrite(12,LOW);
-    digitalWrite(11,LOW);  
+    digitalWrite(11,LOW);
+    digitalWrite(10,LOW);  
     return;
   }
   //ACTIVE
   if(currentState==1){    
-    digitalWrite(13,LOW);
     digitalWrite(12,LOW);
-    digitalWrite(11, HIGH);
+    digitalWrite(11,LOW);
+    digitalWrite(10, HIGH);
     return;
   }
   //ERROR
   if(currentState==2){    
-    digitalWrite(13,HIGH);
-    digitalWrite(12,LOW);
+    digitalWrite(12,HIGH);
     digitalWrite(11,LOW);
+    digitalWrite(10,LOW);
     return;
   }
   //IDLE
   if(currentState==3){    
-    digitalWrite(13,LOW);
-    digitalWrite(12,HIGH);
-    digitalWrite(11,LOW);
+    digitalWrite(12,LOW);
+    digitalWrite(11,HIGH);
+    digitalWrite(10,LOW);
     return;
   }
 }
